@@ -34,27 +34,7 @@
       </action>
     </pluginExecution>
 
-    <!-- Goals that should be ignored in m2e -->
-    <pluginExecution>
-      <pluginExecutionFilter>
-        <goals>
-          <goal>ant</goal>
-          <goal>baseline</goal>
-          <goal>baseline-report</goal>
-          <goal>bundle</goal>
-          <goal>instructions</goal>
-          <goal>cleanVersions</goal>
-          <!-- deprecated -->
-          <goal>bundleall</goal>
-          <goal>wrap</goal>
-        </goals>
-      </pluginExecutionFilter>
-      <action>
-        <execute>
-          <ignore />
-        </execute>
-      </action>
-    </pluginExecution>
+    <!-- All other goals that should be ignored in m2e, so don't list them here -->
 
   </pluginExecutions>
 </lifecycleMappingMetadata>
