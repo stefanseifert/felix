@@ -289,7 +289,7 @@ public class BundlePlugin extends AbstractMojo
      * The Maven project.
      */
     @Parameter( defaultValue = "${project}", readonly = true, required = true )
-    private MavenProject project;
+    protected MavenProject project;
 
     /**
      * The BND instructions for the bundle.
