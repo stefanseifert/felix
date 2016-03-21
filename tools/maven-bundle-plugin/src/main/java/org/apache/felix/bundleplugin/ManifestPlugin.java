@@ -41,6 +41,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.dependency.graph.DependencyNode;
+import org.osgi.service.metatype.MetaTypeService;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 import aQute.bnd.header.Parameters;
@@ -152,6 +153,7 @@ public class ManifestPlugin extends BundlePlugin
     private static void exportScr(Analyzer analyzer, Jar jar, File scrLocation, BuildContext buildContext) throws Exception {
         scrLocation.mkdirs();
 
+        // export SCR metadata files from OSGI-INF/
         String bpHeader = analyzer.getProperty(Analyzer.SERVICE_COMPONENT);
         Parameters map = Processor.parseHeader(bpHeader, null);
         for (String root : map.keySet())
@@ -176,6 +178,18 @@ public class ManifestPlugin extends BundlePlugin
                 }
             }
         }
+
+        // export metatype files from OSGI-INF/metatype
+        Map<String,Resource> metatypeDir = jar.getDirectories().get(MetaTypeService.METATYPE_DOCUMENTS_LOCATION);
+        if (metatypeDir != null) {
+            for (Map.Entry<String, Resource> entry : metatypeDir.entrySet())
+            {
+                String path = entry.getKey();
+                Resource resource = entry.getValue();
+                writeSCR(resource, new File(scrLocation, path), buildContext);
+            }
+        }
+
     }
 
     private static void writeSCR(Resource resource, File destination, BuildContext buildContext) throws Exception
