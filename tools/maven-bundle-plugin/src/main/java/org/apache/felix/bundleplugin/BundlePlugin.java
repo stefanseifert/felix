@@ -523,7 +523,7 @@ public class BundlePlugin extends AbstractMojo
 
                 try
                 {
-                    ManifestPlugin.writeManifest( builder, outputFile, niceManifest, exportScr, scrLocation, buildContext );
+                    ManifestPlugin.writeManifest( builder, outputFile, niceManifest, exportScr, scrLocation, buildContext, getLog() );
                 }
                 catch ( IOException e )
                 {

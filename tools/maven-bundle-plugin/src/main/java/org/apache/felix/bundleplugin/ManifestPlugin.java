@@ -34,6 +34,7 @@ import java.util.jar.Manifest;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -104,7 +105,7 @@ public class ManifestPlugin extends BundlePlugin
 
         try
         {
-            writeManifest( analyzer, outputFile, niceManifest, exportScr, scrLocation, buildContext );
+            writeManifest( analyzer, outputFile, niceManifest, exportScr, scrLocation, buildContext, getLog() );
         }
         catch ( Exception e )
         {
@@ -141,7 +142,7 @@ public class ManifestPlugin extends BundlePlugin
 
         if (exportScr)
         {
-            exportScr(analyzer, jar, scrLocation, buildContext);
+            exportScr(analyzer, jar, scrLocation, buildContext, getLog() );
         }
 
         // cleanup...
@@ -150,7 +151,8 @@ public class ManifestPlugin extends BundlePlugin
         return manifest;
     }
     
-    private static void exportScr(Analyzer analyzer, Jar jar, File scrLocation, BuildContext buildContext) throws Exception {
+    private static void exportScr(Analyzer analyzer, Jar jar, File scrLocation, BuildContext buildContext, Log log ) throws Exception {
+        log.debug("Export SCR metadata to: " + scrLocation.getPath());
         scrLocation.mkdirs();
 
         // export SCR metadata files from OSGI-INF/
@@ -165,7 +167,7 @@ public class ManifestPlugin extends BundlePlugin
                 Resource resource = jar.getResource(root);
                 if (resource != null)
                 {
-                    writeSCR(resource, location, buildContext);
+                    writeSCR(resource, location, buildContext, log);
                 }
             }
             else
@@ -174,7 +176,7 @@ public class ManifestPlugin extends BundlePlugin
                 {
                     String path = entry.getKey();
                     Resource resource = entry.getValue();
-                    writeSCR(resource, new File(location, path), buildContext);
+                    writeSCR(resource, new File(location, path), buildContext, log);
                 }
             }
         }
@@ -186,14 +188,15 @@ public class ManifestPlugin extends BundlePlugin
             {
                 String path = entry.getKey();
                 Resource resource = entry.getValue();
-                writeSCR(resource, new File(scrLocation, path), buildContext);
+                writeSCR(resource, new File(scrLocation, path), buildContext, log);
             }
         }
 
     }
 
-    private static void writeSCR(Resource resource, File destination, BuildContext buildContext) throws Exception
+    private static void writeSCR(Resource resource, File destination, BuildContext buildContext, Log log ) throws Exception
     {
+        log.debug("Write SCR file: " + destination.getPath());
         destination.getParentFile().mkdirs();
         OutputStream os = buildContext.newFileOutputStream(destination);
         try
@@ -305,7 +308,7 @@ public class ManifestPlugin extends BundlePlugin
 
 
     public static void writeManifest( Analyzer analyzer, File outputFile, boolean niceManifest,
-            boolean exportScr, File scrLocation, BuildContext buildContext ) throws Exception
+            boolean exportScr, File scrLocation, BuildContext buildContext, Log log ) throws Exception
     {
         Properties properties = analyzer.getProperties();
         Jar jar = analyzer.getJar();
@@ -331,18 +334,19 @@ public class ManifestPlugin extends BundlePlugin
             File parentFile = outputFile.getParentFile();
             parentFile.mkdirs();
         }
-        writeManifest( manifest, outputFile, niceManifest, buildContext );
+        writeManifest( manifest, outputFile, niceManifest, buildContext, log );
         
         if (exportScr)
         {
-            exportScr(analyzer, jar, scrLocation, buildContext);            
+            exportScr(analyzer, jar, scrLocation, buildContext, log);            
         }
     }
 
 
     public static void writeManifest( Manifest manifest, File outputFile, boolean niceManifest,
-            BuildContext buildContext ) throws IOException
+            BuildContext buildContext, Log log ) throws IOException
     {
+        log.debug("Write manifest to " + outputFile.getPath());
         outputFile.getParentFile().mkdirs();
 
         OutputStream os = buildContext.newFileOutputStream( outputFile );
